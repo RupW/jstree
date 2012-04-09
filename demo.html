@@ -1,0 +1,249 @@
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="content-type" />
+	<title>jsTree native checkboxes demo</title>
+	<script type="text/javascript" src="_lib/jquery.js"></script>
+	<script type="text/javascript" src="_lib/jquery.hotkeys.js"></script>
+	<script type="text/javascript" src="vakata.js"></script>
+	<script type="text/javascript" src="jstree.core.js"></script>
+	<script type="text/javascript" src="jstree.themes.js"></script>
+	<script type="text/javascript" src="jstree.ui.js"></script>
+	<script type="text/javascript" src="jstree.state.js"></script>
+	<script type="text/javascript" src="jstree.html.js"></script>
+	<script type="text/javascript" src="jstree.json.js"></script>
+	<script type="text/javascript" src="jstree.checkbox.js"></script>
+	<script type="text/javascript" src="jstree.nativecheckbox.js"></script>
+	<script type="text/javascript" src="jquery.support.checkboxindeterminate.js"></script>
+	<style type="text/css">
+	html, body { margin:0; padding:0; font-family:Verdana; font-size:10px; }
+	#container { width:800px; margin:0 auto; }
+	.demo { width:300px; margin:20px auto; float:none; border:1px solid gray; height:200px; overflow:auto; }
+	.result-yes { color: Green; }
+	.result-no { color: Red; }
+	.result-error { color: Blue; }
+	#demo-table td { text-align:center; }
+	</style>
+	<script type="text/javascript">
+	    $(function() {
+	        // Set indeterminate value in table
+            $('#indeterminate1').prop('indeterminate', true);
+            $('#indeterminate2').prop('indeterminate', true);
+
+	        // Detection tests
+	        var $test1 = $('#test1');
+	        var supportsIndeterminate = false;
+	        try {
+	            // Test 1
+	            //
+	            // Test for the property on a newly-created input element
+	            // Not typed; not attached to the DOM
+	            var newInput = document.createElement('input');
+	            supportsIndeterminate = ('indeterminate' in newInput);
+	            $test1.text(supportsIndeterminate ? 'Present:' : 'Not present:');
+	            $test1.addClass(supportsIndeterminate ? 'result-yes' : 'result-no');
+	        }
+	        catch (e) {
+	            $test1.text('Exception in test:');
+	            $test1.addClass('result-error');
+	        }
+
+	        var $test2 = $('#test2');
+	        try {
+	            // Test 2
+	            //
+	            // Test for the property on a newly-created input element
+	            // Typed as checkbox; not attached to the DOM
+	            var newInput = document.createElement('input');
+	            newInput.type = 'checkbox';
+	            supportsIndeterminate = ('indeterminate' in newInput);
+	            $test2.text(supportsIndeterminate ? 'Present:' : 'Not present:');
+	            $test2.addClass(supportsIndeterminate ? 'result-yes' : 'result-no');
+	        }
+	        catch (e) {
+	            $test2.text('Exception in test:');
+	            $test2.addClass('result-error');
+	        }
+
+	        var $test3 = $('#test3');
+	        try {
+	            // Test 3
+	            //
+	            // Test for the property on a newly-created input element
+	            // Typed as checkbox and attached to the DOM
+	            var newInput = document.createElement('input');
+	            newInput.type = 'checkbox';
+	            $test3[0].appendChild(newInput);
+	            supportsIndeterminate = ('indeterminate' in newInput);
+	            $test3.text(supportsIndeterminate ? 'Present:' : 'Not present:');
+	            $test3.addClass(supportsIndeterminate ? 'result-yes' : 'result-no');
+	        }
+	        catch (e) {
+	            $test3.text('Exception in test:');
+	            $test3.addClass('result-error');
+	        }
+
+	        var $test4 = $('#test4');
+	        try {
+	            // Test 4
+	            //
+	            // Not Safari for Windows
+	            var n = window.navigator;
+	            function navcontains(key, value) { return (typeof (n[key]) === 'string') && (n[key].indexOf(value) >= 0); }
+	            var isSafariWin = n && navcontains('vendor', 'Apple') && navcontains('platform', 'Win') && navcontains('userAgent', 'Safari');
+	            if (isSafariWin) {
+	                supportsIndeterminate = false;
+	            }
+
+	            $test4.text(supportsIndeterminate ? 'Not detected:' : 'Detected:');
+	            $test4.addClass(supportsIndeterminate ? 'result-yes' : 'result-no');
+	        }
+	        catch (e) {
+	            $test4.text('Exception in test:');
+	            $test4.addClass('result-error');
+	        }
+
+	        $('#result').text(supportsIndeterminate ? 'supports' : 'does not support');
+	        $('#result-p').addClass(supportsIndeterminate ? 'result-yes' : 'result-no');
+
+	        // Finally use the detection script result
+	        try {
+	            var scriptResult = $.support.checkboxIndeterminate;
+	            $('#script-result').text(scriptResult ? 'present' : 'not present');
+	            $('#script-result').addClass(scriptResult ? 'result-yes' : 'result-no');
+	        } catch (e) {
+	            $('#script-result').text('exception');
+	            $('#script-result').addClass('result-error');
+	        }
+
+	        // jsTree with checkbox plugin
+	        var tree1 = $("#jstree-checkbox");
+	        tree1.bind('__loaded.jstree', function() {
+	            tree1.jstree('check_node', $('#cb-c-pf'));
+	            tree1.jstree('check_node', $('#cb-c-u-r-d'));
+	        })
+	        .jstree({
+	            'plugins': ["themes", "html_data", "checkbox", "sort", "ui"]
+	        });
+	        // jsTree with native checkboxes
+	        var tree2 = $("#jstree-nativecheckbox");
+	        tree2.bind('__loaded.jstree', function() {
+	            tree2.jstree('check_node', $('#ncb-c-pf'));
+	            tree2.jstree('check_node', $('#ncb-c-u-r-d'));
+	        })
+	        .jstree({
+	            'plugins': ["themes", "html_data", "nativecheckbox", "sort", "ui"]
+	        });
+	    });
+	</script>
+</head>
+<body>
+<div style="width:960px; margin:10px auto;">
+<h1>Checkbox 'indeterminate' property detection demo</h1>
+<div style="float:left; width:20%; margin-left:1%;">
+<p>Your browser renders:</p>
+<table id="demo-table">
+<thead><tr><th></th><th>enabled</th><th>disabled</th></tr></thead>
+<tbody>
+<tr><th>checked</th><td><input type="checkbox" checked="checked" /></td><td><input type="checkbox" checked="checked" disabled="disabled" /></td></tr>
+<tr><th>indeterminate</th><td><input type="checkbox" checked="checked" id="indeterminate1" /></td><td><input type="checkbox" checked="checked" disabled="disabled" id="indeterminate2" /></td></tr>
+<tr><th>unchecked</th><td><input type="checkbox" /></td><td><input type="checkbox" checked="checked" disabled="disabled" /></td></tr>
+</tbody>
+</table>
+</div>
+<div style="float:right; width:75%; margin-right:1%;">
+<p>Your browser:</p>
+<ul><li><span id="test1">Test:</span> 'indeterminate' property in a newly-created untyped &lt;input&gt; element not attached to the DOM</li>
+<li><span id="test2">Test:</span> 'indeterminate' property in a newly-created &lt;input type="checkbox"&gt; element not attached to the DOM</li>
+<li><span id="test3">Test:</span> 'indeterminate' property in a newly-created &lt;input type="checkbox"&gt; element attached to the DOM</li>
+<li><span id="test4">Test:</span> Safari for Windows (supports property but renders it incorrectly)</li>
+</ul>
+<p id="result-p">=&gt; <span id="result">may support</span> indeterminate checkboxes.</p>
+<p id="script-result-p"><a href="https://gist.github.com/2318497">jQuery.support.checkboxIndeterminate</a> reports: <span id="script-result">TBD</span></p>
+</div>
+<br style="clear:both;" />
+<div style="float:left; width:45%; margin-left:1%;">
+<h2>jsTree checkboxes plugin (images)</h2>
+<div id="jstree-checkbox">
+    <ul>
+        <li id="cb-c" class="jstree-open"><a href="#">C:\ Windows</a>
+            <ul>
+                <li id="cb-c-pf" class="jstree-open"><a href="#">Program Files</a>
+                    <ul>
+                        <li class="jstree-open"><a href="#">Common Files</a></li>
+                        <li class="jstree-open"><a href="#">Microsoft Office</a></li>
+                        <li class="jstree-open"><a href="#">Windows Media Player</a></li></ul>
+                </li>
+                <li id="cb-c-u" class="jstree-open"><a href="#">Users</a>
+                    <ul>
+                        <li class="jstree-open"><a href="#">Rupert</a>
+                            <ul>
+                                <li class="jstree-open" id="cb-c-u-r-d"><a href="#">Documents</a></li>
+                                <li class="jstree-open"><a href="#">Music</a></li>
+                                <li class="jstree-open"><a href="#">Videos</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li id="cb-c-w" class="jstree-open"><a href="#">Windows</a>
+                    <ul>
+                        <li class="jstree-open"><a href="#">Help</a></li>
+                        <li class="jstree-open"><a href="#">System32</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li id="cb-d" class="jstree-open"><a href="#">D:\ The Movie</a>
+            <ul>
+                <li id="cb-d-ats" class="jstree-open"><a href="#">AUDIO_TS</a></li>
+                <li id="cb-d-vts" class="jstree-open"><a href="#">VIDEO_TS</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+</div>
+<div style="float:right; width:45%; margin-right:1%;">
+    <h2>Rendering as native checkboxes</h2>
+    <div id="jstree-nativecheckbox">
+    <ul>
+        <li id="ncb-c" class="jstree-open"><a href="#">C:\ Windows</a>
+            <ul>
+                <li id="ncb-c-pf" class="jstree-open"><a href="#">Program Files</a>
+                    <ul>
+                        <li class="jstree-open"><a href="#">Common Files</a></li>
+                        <li class="jstree-open"><a href="#">Microsoft Office</a></li>
+                        <li class="jstree-open"><a href="#">Windows Media Player</a></li></ul>
+                </li>
+                <li id="ncb-c-u" class="jstree-open"><a href="#">Users</a>
+                    <ul>
+                        <li class="jstree-open"><a href="#">Rupert</a>
+                            <ul>
+                                <li class="jstree-open" id="ncb-c-u-r-d"><a href="#">Documents</a></li>
+                                <li class="jstree-open"><a href="#">Music</a></li>
+                                <li class="jstree-open"><a href="#">Videos</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li id="ncb-c-w" class="jstree-open"><a href="#">Windows</a>
+                    <ul>
+                        <li class="jstree-open"><a href="#">Help</a></li>
+                        <li class="jstree-open"><a href="#">System32</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li id="ncb-d" class="jstree-open"><a href="#">D:\ The Movie</a>
+            <ul>
+                <li id="ncb-d-ats" class="jstree-open"><a href="#">AUDIO_TS</a></li>
+                <li id="ncb-d-vts" class="jstree-open"><a href="#">VIDEO_TS</a></li>
+            </ul>
+        </li>
+    </ul>
+    </div>
+</div>
+</div>
+</body>
+</html>
